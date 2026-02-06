@@ -37,6 +37,12 @@ LOG_DIR = os.path.join(BASE_DIR, "logs")  # noqa
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
+# Disable CSRF middleware for local dev.
+# Admin sign-up/sign-in forms do cross-site POST (127.0.0.1 -> localhost).
+# SameSite=None requires HTTPS; on HTTP Chrome ignores it and falls back to Lax,
+# which blocks cross-site POST cookies.
+MIDDLEWARE = [m for m in MIDDLEWARE if m != "django.middleware.csrf.CsrfViewMiddleware"]  # noqa
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
