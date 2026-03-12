@@ -86,6 +86,11 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        "plane.authentication": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
         "plane.migrations": {
             "level": "INFO",
             "handlers": ["console"],

@@ -167,8 +167,8 @@ export function InstanceAIForm(props: IInstanceAIForm) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 items-start">
-        <Button variant="primary" size="lg" onClick={() => void handleSubmit(onSubmit)()} loading={isSubmitting}>
+      <div className="flex flex-col items-start gap-4">
+        <Button variant="primary" size="lg" onClick={handleSubmit(onSubmit)} loading={isSubmitting}>
           {isSubmitting ? "Saving" : "Save changes"}
         </Button>
 
