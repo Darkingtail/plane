@@ -1,0 +1,51 @@
+# Plane GitLab Bridge - 模块与 GitLab 仓库映射配置
+#
+# 与 jira-scripts 的区别：
+# - 使用 Plane Label 名称 (而非 JIRA Component 名称) 匹配模块
+# - 移除了 jpom_projects 配置
+# - 分支名模板使用 {issue_identifier} 替代 {story_key}
+
+workflow:
+  branches:
+    main: 'main'
+    release: 'release'
+    test: 'test'
+    dev: 'dev'
+
+modules:
+  # 示例模块 - name 必须与 Plane Label 名称一致
+  - name: 'repo:admin-web'
+    display_name: '管理后台前端'
+    gitlab:
+      project_id: 'your-group/admin-web'
+      repository_url: 'ssh://git@gitlab.example.com/your-group/admin-web.git'
+      branches:  # 可选：覆盖全局配置
+    enabled: true
+
+  - name: 'repo:api-server'
+    display_name: 'API 服务端'
+    gitlab:
+      project_id: 'your-group/api-server'
+      repository_url: 'ssh://git@gitlab.example.com/your-group/api-server.git'
+    enabled: true
+
+gitlab:
+  url_env: 'GITLAB_URL'
+  token_env: 'GITLAB_TOKEN'
+  branch_name_template: 'feature/{issue_identifier}_{date}_{desc}'
+  timeout: 30
+  max_retries: 3
+
+branch_creation:
+  check_existence: true
+  if_exists: 'skip'
+  add_plane_comment: true
+  comment_template: |
+    <p>已自动创建 GitLab 分支:</p>
+    <ul>
+    <li>模块: {module_name}</li>
+    <li>仓库: {repository_url}</li>
+    <li>分支: <code>{branch_name}</code></li>
+    <li>基线: <code>{base_branch}</code></li>
+    <li>链接: <a href="{branch_url}">{branch_url}</a></li>
+    </ul>

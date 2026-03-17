@@ -1,0 +1,5 @@
+{
+  "gitlab_url": "http://172.16.7.53:9090",
+  "token": "v8jCqrW3kvjSc5ss3B9V",
+  "enabled_repos": ["wangxu/jira1", "wangxu/jpom-demo"]
+}

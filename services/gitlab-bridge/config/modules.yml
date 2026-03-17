@@ -1,0 +1,45 @@
+# Plane GitLab Bridge - 模块与 GitLab 仓库映射配置
+# Label name 必须与 Plane 项目中的 Label 名称完全一致
+
+workflow:
+  branches:
+    main: 'main'
+    release: 'release'
+    test: 'test'
+    dev: 'dev'
+
+modules:
+  - name: 'repo:jira1'
+    display_name: 'jira1'
+    gitlab:
+      project_id: 'wangxu/jira1'
+      repository_url: 'ssh://git@172.16.7.53:2224/wangxu/jira1.git'
+    enabled: true
+
+  - name: 'repo:jpom-demo'
+    display_name: 'jpom-demo'
+    gitlab:
+      project_id: 'wangxu/jpom-demo'
+      repository_url: 'ssh://git@172.16.7.53:2224/wangxu/jpom-demo.git'
+    enabled: true
+
+gitlab:
+  url_env: 'GITLAB_URL'
+  token_env: 'GITLAB_TOKEN'
+  branch_name_template: 'feature/{issue_identifier}_{date}_{desc}'
+  timeout: 30
+  max_retries: 3
+
+branch_creation:
+  check_existence: true
+  if_exists: 'skip'
+  add_plane_comment: true
+  comment_template: |
+    <p>已自动创建 GitLab 分支:</p>
+    <ul>
+    <li>模块: {module_name}</li>
+    <li>仓库: {repository_url}</li>
+    <li>分支: <code>{branch_name}</code></li>
+    <li>基线: <code>{base_branch}</code></li>
+    <li>链接: <a href="{branch_url}">{branch_url}</a></li>
+    </ul>
