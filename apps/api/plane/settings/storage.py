@@ -37,18 +37,27 @@ class S3Storage(S3Boto3Storage):
         self.signed_url_expiration = int(os.environ.get("SIGNED_URL_EXPIRATION", "3600"))
 
         if os.environ.get("USE_MINIO") == "1":
-            # Determine protocol based on environment variable
-            if os.environ.get("MINIO_ENDPOINT_SSL") == "1":
-                endpoint_protocol = "https"
+            # MINIO_PRESIGNED_BASE_URL: external URL for browser-facing presigned URLs
+            # In production, Nginx proxies /uploads to MinIO so request.get_host() works.
+            # In local dev without Nginx, set this to http://localhost:9000.
+            presigned_base_url = os.environ.get("MINIO_PRESIGNED_BASE_URL")
+            if presigned_base_url:
+                endpoint_url = presigned_base_url
+            elif request:
+                if os.environ.get("MINIO_ENDPOINT_SSL") == "1":
+                    endpoint_protocol = "https"
+                else:
+                    endpoint_protocol = request.scheme
+                endpoint_url = f"{endpoint_protocol}://{request.get_host()}"
             else:
-                endpoint_protocol = request.scheme if request else "http"
+                endpoint_url = self.aws_s3_endpoint_url
             # Create an S3 client for MinIO
             self.s3_client = boto3.client(
                 "s3",
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
                 region_name=self.aws_region,
-                endpoint_url=(f"{endpoint_protocol}://{request.get_host()}" if request else self.aws_s3_endpoint_url),
+                endpoint_url=endpoint_url,
                 config=boto3.session.Config(signature_version="s3v4"),
             )
         else:
