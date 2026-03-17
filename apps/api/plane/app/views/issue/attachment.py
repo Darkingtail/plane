@@ -98,9 +98,16 @@ class IssueAttachmentV2Endpoint(BaseAPIView):
         type = request.data.get("type", False)
         size = int(request.data.get("size", settings.FILE_SIZE_LIMIT))
 
+        # Fallback: if frontend sends empty type, infer from filename extension
+        if not type and name:
+            import mimetypes
+            guessed, _ = mimetypes.guess_type(name)
+            if guessed:
+                type = guessed
+
         if not type or type not in settings.ATTACHMENT_MIME_TYPES:
             return Response(
-                {"error": "Invalid file type.", "status": False},
+                {"error": f"Invalid file type: {type!r}", "status": False},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
