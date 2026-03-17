@@ -103,8 +103,10 @@ class EmailCredentialCheckEndpoint(BaseAPIView):
             EMAIL_FROM,
         ) = get_email_configuration()
 
-        # Configure all the connections
+        # Configure all the connections — explicitly use SMTP backend
+        # so test emails work regardless of the default EMAIL_BACKEND setting
         connection = get_connection(
+            backend="django.core.mail.backends.smtp.EmailBackend",
             host=EMAIL_HOST,
             port=int(EMAIL_PORT),
             username=EMAIL_HOST_USER,
